@@ -12,6 +12,8 @@
 #include <QTcpServer>
 #include <QTcpSocket>
 #include <QLayoutItem>
+#include "tweetwidget.h"
+#include <QTimer>
 
 namespace Ui {
 class MainWindow;
@@ -42,6 +44,8 @@ public slots:
 
     void removeTweet(QLayoutItem* item, int position = 0);
     void clearTweets();
+
+    void ActualiseTweet();
 
 protected:
     void parseFeed();
@@ -74,6 +78,12 @@ private:
 
     int contentWidth;
     int contentHeigh;
+
+    QList<TweetWidget*> *TweetCarroussel;
+    int TweetCarrousselIndex;
+
+    QTimer* TweetTime;
+
 };
 
 #endif // MAINWINDOW_H

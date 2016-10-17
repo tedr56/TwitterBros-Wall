@@ -28,7 +28,9 @@ void TweetWidget::setData(QUrl Avatar, QString User, QString ReUser, QString Tex
 
     Text = parseHashTag(Text);
     Text = parseArobace(Text);
-    ui->Tweet->setText(Text);
+
+    //ui->Tweet->setText(Text);
+    ui->Tweet->setText("<html><head/><body><p><span style=\" font-size:14pt;\">" + Text + "</span></p></body></html>");
 
     ui->Avatar->setText(User);
     setAvatar(Avatar);

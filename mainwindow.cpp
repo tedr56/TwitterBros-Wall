@@ -1,7 +1,7 @@
 #include <QUrl>
 #include <QDesktopServices>
 #include <QJsonDocument>
-#include <QWebView>
+#include <QWebEngineView>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -76,6 +76,13 @@ MainWindow::MainWindow(QWidget *parent) :
 
 //    if (o1->linked())
 //        makeRequest();
+
+    TweetCarroussel = new QList<TweetWidget*>();
+    TweetCarrousselIndex = 0;
+    TweetTime = new QTimer();
+    TweetTime->setInterval(10000);
+    TweetTime->setSingleShot(false);
+    connect(TweetTime, SIGNAL(timeout()), this, SLOT(ActualiseTweet()));
 }
 
 MainWindow::~MainWindow()
@@ -233,7 +240,7 @@ void MainWindow::addReTweet()
 
     QString embedHtmlTweet = JsonParser(embedJsonTweet).parseJson("html");
 
-    QWebView* TweetView = new QWebView(ui->Widget);
+    QWebEngineView* TweetView = new QWebEngineView(ui->ContentWidget);
     TweetView->setHtml(embedHtmlTweet);
     //ui->TwitterRetweet->addWidget(TweetView);
     reply->deleteLater();
@@ -419,7 +426,7 @@ void MainWindow::addTweet(QJsonDocument* JsonTweet)
 
     QString Text = Parser.parseJson("text");
 
-    TweetWidget* newTweet = new TweetWidget(manager, ui->Widget);
+    TweetWidget* newTweet = new TweetWidget(manager, ui->ContentWidget);
 
     newTweet->setData(avatar,user,rt_user, Text);
 
@@ -429,16 +436,32 @@ void MainWindow::addTweet(QJsonDocument* JsonTweet)
     if (media.size())
         newTweet->setContent(media);
 
+    newTweet->hide();
+
     ui->TwitterFeed->insertWidget(0, newTweet);
 
-    newTweet->show();
+    //newTweet->show();
 
+    TweetCarroussel->append(newTweet);
+    if (TweetCarroussel->size() > 10) {
+        if (TweetCarrousselIndex > 1) {
+            TweetCarroussel->removeAt(0);
+            TweetCarrousselIndex--;
+        }
+    }
+
+    if (!TweetTime->isActive()) {
+        TweetTime->start();
+        ActualiseTweet();
+    }
+    /*
     while (ui->TwitterFeed->count() > 10) {
         int position = ui->TwitterFeed->count() - 2;
         QLayoutItem* lastTweet = ui->TwitterFeed->itemAt(position);
         removeTweet(lastTweet, position);
 
     }
+    */
 
 }
 
@@ -456,5 +479,17 @@ void MainWindow::clearTweets()
         QLayoutItem* item = ui->TwitterFeed->itemAt(0);
         removeTweet(item);
     }
+}
+
+void MainWindow::ActualiseTweet()
+{
+    if (TweetCarroussel->size() > 1) {
+        TweetCarroussel->at(TweetCarrousselIndex)->hide();
+    }
+    TweetCarrousselIndex++;
+    if (TweetCarrousselIndex >= TweetCarroussel->size()) {
+        TweetCarrousselIndex = 0;
+    }
+    TweetCarroussel->at(TweetCarrousselIndex)->show();
 }
 
