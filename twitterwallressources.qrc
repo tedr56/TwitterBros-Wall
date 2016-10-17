@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/">
+        <file>logo_pano_long.png</file>
+        <file>HASHTAG.txt</file>
+        <file>RESOLUTION-CONTENU.txt</file>
+    </qresource>
+</RCC>
